@@ -106,7 +106,7 @@ func (util *snowflakeS3Client) getFileHeader(meta *fileMetadata, filename string
 	}
 	return &fileHeader{
 		out.Metadata[sfcDigest],
-		out.ContentLength,
+		convContentLength(out.ContentLength),
 		&encMeta,
 	}, nil
 }
@@ -284,4 +284,16 @@ func (util *snowflakeS3Client) getS3Object(meta *fileMetadata, filename string) 
 		Bucket: &s3loc.bucketName,
 		Key:    &s3path,
 	}, nil
+}
+
+func convContentLength(v interface{}) int64 {
+	switch x := v.(type) {
+	case int64:
+		return x
+	case *int64:
+		if x != nil {
+			return *x
+		}
+	}
+	return 0
 }
